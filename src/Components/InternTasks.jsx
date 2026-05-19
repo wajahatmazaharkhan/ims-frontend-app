@@ -121,7 +121,7 @@ const InternTasksPage = () => {
               console.error("Error fetching task", t.taskId, err);
               return { ...t, details: null };
             }
-          })
+          }),
         );
 
         setTasksWithDetails(detailed);
@@ -138,7 +138,7 @@ const InternTasksPage = () => {
 
   // Helper: compute completion stats
   const stats = useMemo(() => {
-    const total = tasksWithDetails.length;
+    const total = tasksWithDetails.filter((t) => t.details !== null).length;
     let completed = 0;
     let overdue = 0;
     const now = new Date();
@@ -249,7 +249,7 @@ const InternTasksPage = () => {
 
   // Filter + sort tasks
   const visibleTasks = useMemo(() => {
-    let result = [...tasksWithDetails];
+    let result = [...tasksWithDetails].filter((t) => t.details !== null);
 
     if (categoryFilter !== "all") {
       result = result.filter((t) => {
@@ -287,13 +287,13 @@ const InternTasksPage = () => {
         const da = a.details?.startDate
           ? new Date(a.details.startDate).getTime()
           : a.details?.createdAt
-          ? new Date(a.details.createdAt).getTime()
-          : 0;
+            ? new Date(a.details.createdAt).getTime()
+            : 0;
         const db = b.details?.startDate
           ? new Date(b.details.startDate).getTime()
           : b.details?.createdAt
-          ? new Date(b.details.createdAt).getTime()
-          : 0;
+            ? new Date(b.details.createdAt).getTime()
+            : 0;
         return db - da;
       });
     }
@@ -677,11 +677,11 @@ const InternTasksPage = () => {
                       <Info className="w-6 h-6 text-gray-400 dark:text-slate-400" />
                     </div>
                     <h3 className="text-base font-medium text-gray-900 dark:text-slate-100 mb-1">
-                      No tasks match your filters
+                      No tasks assigned yet
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-slate-300">
-                      Try changing the status/category filters or clearing the
-                      search.
+                      You have no tasks assigned to you currently. Contact your
+                      HR for assistance.
                     </p>
                   </div>
                 ) : (
@@ -731,7 +731,7 @@ const InternTasksPage = () => {
                                     Start:{" "}
                                     {task.details?.startDate
                                       ? new Date(
-                                          task.details.startDate
+                                          task.details.startDate,
                                         ).toLocaleDateString()
                                       : "Not set"}
                                   </span>
@@ -742,7 +742,7 @@ const InternTasksPage = () => {
                                     End:{" "}
                                     {task.details?.endDate
                                       ? new Date(
-                                          task.details.endDate
+                                          task.details.endDate,
                                         ).toLocaleDateString()
                                       : "Not set"}
                                   </span>
@@ -756,10 +756,12 @@ const InternTasksPage = () => {
                                       deadlineInfo.tone === "overdue"
                                         ? "text-red-600 dark:text-red-400"
                                         : deadlineInfo.tone === "urgent"
-                                        ? "text-orange-600 dark:text-orange-400"
-                                        : deadlineInfo.tone === "soon"
-                                        ? "text-yellow-600 dark:text-yellow-400"
-                                        : "text-emerald-600 dark:text-emerald-400"
+                                          ? "text-orange-600 dark:text-orange-400"
+                                          : deadlineInfo.tone === "soon"
+                                            ? "text-yellow-600 dark:text-yellow-400"
+                                            : deadlineInfo.tone === "safe"
+                                              ? "text-emerald-600 dark:text-emerald-400"
+                                              : "text-gray-500 dark:text-slate-400"
                                     }
                                   >
                                     {deadlineInfo.label}

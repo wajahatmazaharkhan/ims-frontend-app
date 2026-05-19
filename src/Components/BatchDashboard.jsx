@@ -110,14 +110,14 @@ const BatchDashboard = () => {
         // Option A: Filter tasks array first to only those assigned to current user
         // Compare as strings because one side might be ObjectId
         const tasksForUser = tasks.filter(
-          (t) => String(t.assignedTo) === String(currentUserId)
+          (t) => String(t.assignedTo) === String(currentUserId),
         );
 
         const tasksWithDetails = await Promise.all(
           tasksForUser.map(async (task) => {
             try {
               const response = await fetch(
-                `${baseUrl}/task/get-task/${task.taskId}`
+                `${baseUrl}/task/get-task/${task.taskId}`,
               );
               if (!response.ok) throw new Error("Failed to fetch task");
               const data = await response.json();
@@ -133,7 +133,7 @@ const BatchDashboard = () => {
                 details: null,
               };
             }
-          })
+          }),
         );
 
         setTasksWithDetails(tasksWithDetails);
@@ -197,6 +197,7 @@ const BatchDashboard = () => {
 
   const getFilteredTasks = (category) => {
     return tasksWithDetails.filter((task) => {
+      if (!task.details) return false; // ← ADD THIS LINE
       const taskCategory =
         task.details?.category || task.details?.taskType || "technical";
       return taskCategory.toLowerCase() === category.toLowerCase();
@@ -512,7 +513,7 @@ const BatchDashboard = () => {
                             .toReversed()
                             .map((task, index) => {
                               const assignedIntern = batch.interns?.find(
-                                (intern) => intern._id === task.assignedTo
+                                (intern) => intern._id === task.assignedTo,
                               ) || {
                                 name: "Unassigned",
                                 email: "",
@@ -554,7 +555,7 @@ const BatchDashboard = () => {
                                             Start:{" "}
                                             {task.details?.startDate
                                               ? new Date(
-                                                  task.details.startDate
+                                                  task.details.startDate,
                                                 ).toLocaleDateString()
                                               : "Not set"}
                                           </span>
@@ -565,7 +566,7 @@ const BatchDashboard = () => {
                                             End:{" "}
                                             {task.details?.endDate
                                               ? new Date(
-                                                  task.details.endDate
+                                                  task.details.endDate,
                                                 ).toLocaleDateString()
                                               : "Not set"}
                                           </span>
@@ -616,11 +617,14 @@ const BatchDashboard = () => {
                             <Info className="h-8 w-8 text-gray-400 dark:text-slate-400" />
                           </div>
                           <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">
-                            No {activeTab} tasks found
+                            {tasksWithDetails.length === 0
+                              ? "No tasks assigned yet"
+                              : `No ${activeTab} tasks found`}
                           </h3>
                           <p className="text-gray-600 dark:text-slate-300 text-sm">
-                            You {`don't`} have any {activeTab} tasks assigned
-                            yet.
+                            {tasksWithDetails.length === 0
+                              ? "You have no tasks assigned currently. Contact your HR for assistance."
+                              : `You don't have any ${activeTab} tasks assigned yet.`}
                           </p>
                         </motion.div>
                       )}
@@ -679,7 +683,7 @@ const BatchDashboard = () => {
                                 <button
                                   onClick={() =>
                                     navigate(
-                                      `/internchat/${hrContact.hrId?._id}`
+                                      `/internchat/${hrContact.hrId?._id}`,
                                     )
                                   }
                                   className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 p-2  hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors"

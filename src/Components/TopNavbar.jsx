@@ -14,6 +14,7 @@ import {
   Trophy,
   Settings as SettingsIcon,
   HelpCircle,
+  Ticket,
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAppContext } from "@/context/AppContext.jsx";
@@ -55,16 +56,6 @@ const TopNavbar = () => {
       label: "Rankings",
       path: "/intern-rankings",
       icon: <Trophy className="w-4 h-4" />,
-    },
-    {
-      label: "Settings",
-      path: "/settings",
-      icon: <SettingsIcon className="w-4 h-4" />,
-    },
-    {
-      label: "Help",
-      path: "/help",
-      icon: <HelpCircle className="w-4 h-4" />,
     },
   ];
 
@@ -126,7 +117,7 @@ const TopNavbar = () => {
     setSearchQuery(query);
     if (query.trim()) {
       const filtered = filteredRoutes.filter((route) =>
-        route.label.toLowerCase().includes(query.toLowerCase())
+        route.label.toLowerCase().includes(query.toLowerCase()),
       );
       setSearchResults(filtered);
     } else {
@@ -246,6 +237,11 @@ const TopNavbar = () => {
         </svg>
       ),
     },
+    {
+      label: "Tickets",
+      path: "/intern-tickets",
+      icon: <Ticket size={16} />,
+    },
     ...(isIntern
       ? [
           {
@@ -310,7 +306,7 @@ const TopNavbar = () => {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify(reqBody),
-            }
+            },
           );
           console.log("🚀 ~ fetchNotifications ~ response:", response);
           if (!response.ok) throw new Error("Failed to fetch notifications");
