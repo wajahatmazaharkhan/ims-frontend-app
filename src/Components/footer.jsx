@@ -1,15 +1,21 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFacebook, faLinkedin, faInstagram } from "@fortawesome/free-brands-svg-icons";
+import {
+  faFacebook,
+  faLinkedin,
+  faInstagram,
+} from "@fortawesome/free-brands-svg-icons";
 
 const Footer = () => {
   return (
-    <footer className="text-gray-800 bg-white border-t border-gray-200 mt-60 dark:text-gray-100 dark:bg-slate-900 dark:border-slate-700 transition-colors duration-300">
+    <footer className="text-gray-800 bg-white border-t border-gray-200 dark:text-gray-100 dark:bg-slate-900 dark:border-slate-700 transition-colors duration-300">
       <div className="max-w-screen-xl px-4 py-5 mx-auto sm:px-6 lg:px-40">
         <div className="grid grid-cols-1 mt-12 text-sm sm:grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-8 sm:text-base">
           <div>
-            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">Company</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Organisation
+            </p>
             <ul className="mt-4 space-y-3">
               <li>
                 <Link
@@ -39,7 +45,9 @@ const Footer = () => {
           </div>
 
           <div>
-            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">Help</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Help
+            </p>
             <ul className="mt-4 space-y-3">
               <li>
                 <Link
@@ -61,7 +69,9 @@ const Footer = () => {
           </div>
 
           <div>
-            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">Legal</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Legal
+            </p>
             <ul className="mt-4 space-y-3">
               <li>
                 <Link
@@ -91,19 +101,36 @@ const Footer = () => {
           </div>
 
           <div>
-            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">Follow Us</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Follow Us
+            </p>
             <ul className="mt-4 space-y-3">
               <li className="flex items-center space-x-2 pt-2">
-                <FontAwesomeIcon icon={faFacebook} className="w-5 h-5 text-blue-600" />
-                <span className="text-gray-800 dark:text-gray-100">Facebook</span>
+                <FontAwesomeIcon
+                  icon={faFacebook}
+                  className="w-5 h-5 text-blue-600"
+                />
+                <span className="text-gray-800 dark:text-gray-100">
+                  Facebook
+                </span>
               </li>
               <li className="flex items-center space-x-2 pt-2">
-                <FontAwesomeIcon icon={faLinkedin} className="w-5 h-5 text-blue-700" />
-                <span className="text-gray-800 dark:text-gray-100">LinkedIn</span>
+                <FontAwesomeIcon
+                  icon={faLinkedin}
+                  className="w-5 h-5 text-blue-700"
+                />
+                <span className="text-gray-800 dark:text-gray-100">
+                  LinkedIn
+                </span>
               </li>
               <li className="flex items-center space-x-2 pt-2">
-                <FontAwesomeIcon icon={faInstagram} className="w-5 h-5 text-pink-500" />
-                <span className="text-gray-800 dark:text-gray-100">Instagram</span>
+                <FontAwesomeIcon
+                  icon={faInstagram}
+                  className="w-5 h-5 text-pink-500"
+                />
+                <span className="text-gray-800 dark:text-gray-100">
+                  Instagram
+                </span>
               </li>
             </ul>
           </div>

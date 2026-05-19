@@ -15,7 +15,7 @@ import Profile from "./Profile";
 import LeaveApplication from "./LeaveApplication";
 import FAQ from "./FAQ";
 import Aboutus from "./Aboutus";
-import Privacypolicy from "./Privacypolicy";
+// import Privacypolicy from "./Privacypolicy";
 import AdminHomePage from "@/Admin/AdminHomePage";
 import AdminProject from "@/Admin/AdminProject";
 import AdminTask from "@/Admin/AdminTask";
@@ -73,7 +73,7 @@ export {
   AdminProject,
   AdminTask,
   AdminReport,
-  Privacypolicy,
+  // Privacypolicy,
   Help,
   AllUsers,
   AdminHelpPage,

@@ -12,8 +12,6 @@ import {
   Home,
   Users,
   Trophy,
-  Settings as SettingsIcon,
-  HelpCircle,
   Ticket,
 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -25,7 +23,6 @@ const TopNavbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // App context
   const { notiCounter, setNotiCounter, dashboard, setDashboard } =
     useAppContext();
   const { loggedIn } = useAuthContext();
@@ -34,19 +31,14 @@ const TopNavbar = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // mobile drawer
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const isAdmin = localStorage.getItem("isAdmin") === "true";
   const isHr = localStorage.getItem("isHr") === "true";
   const isIntern = !(isAdmin || isHr);
 
-  // 🔹 Main nav (merged from old SideNav)
   const mainNavItems = [
-    {
-      label: "Home",
-      path: "/",
-      icon: <Home className="w-4 h-4" />,
-    },
+    { label: "Home", path: "/", icon: <Home className="w-4 h-4" /> },
     {
       label: "Projects",
       path: "/projects",
@@ -59,15 +51,10 @@ const TopNavbar = () => {
     },
   ];
 
-  // 🔹 All available routes for search and mobile drawer
   const availableRoutes = [
     { path: "/aboutus", label: "About Us", public: true },
-    { path: "/privacypolicy", label: "Privacy Policy", public: true },
+    // { path: "/privacypolicy", label: "Privacy Policy", public: true },
     { path: "/frequently-asked-questions", label: "FAQ", public: true },
-
-    // Protected User Routes
-    // { path: "/", label: "Home", public: false },
-    // { path: "/dashboard", label: "Dashboard", public: false },
     { path: "/your-profile", label: "Profile", public: false },
     { path: "/notifications", label: "Notifications", public: false },
     { path: "/reports", label: "Reports", public: false },
@@ -78,8 +65,6 @@ const TopNavbar = () => {
     { path: "/settings", label: "Settings", public: false },
     { path: "/leave-application", label: "Leave Application", public: false },
     { path: "/help-request", label: "Harassment Form", public: false },
-
-    // Admin Routes
     { path: "/admin-access", label: "Admin Dashboard", adminOnly: true },
     {
       path: "/projectmanagement",
@@ -99,10 +84,7 @@ const TopNavbar = () => {
       label: "View All Attendance",
       adminOnly: true,
     },
-
-    // HR Routes
     { path: "/hrhomepage", label: "HR Dashboard", hrOnly: true },
-    // from old SideNav
     { path: "/intern-rankings", label: "Rankings", public: false },
   ];
 
@@ -116,10 +98,11 @@ const TopNavbar = () => {
   const handleSearch = (query) => {
     setSearchQuery(query);
     if (query.trim()) {
-      const filtered = filteredRoutes.filter((route) =>
-        route.label.toLowerCase().includes(query.toLowerCase()),
+      setSearchResults(
+        filteredRoutes.filter((r) =>
+          r.label.toLowerCase().includes(query.toLowerCase()),
+        ),
       );
-      setSearchResults(filtered);
     } else {
       setSearchResults([]);
     }
@@ -237,11 +220,7 @@ const TopNavbar = () => {
         </svg>
       ),
     },
-    {
-      label: "Tickets",
-      path: "/intern-tickets",
-      icon: <Ticket size={16} />,
-    },
+    { label: "Tickets", path: "/intern-tickets", icon: <Ticket size={16} /> },
     ...(isIntern
       ? [
           {
@@ -291,67 +270,68 @@ const TopNavbar = () => {
     },
   ];
 
-  // Fetch notifications
+  // ── Fetch notification UNREAD count for badge ──────────────────────────────
   useEffect(() => {
-    if (loggedIn) {
-      const fetchNotifications = async () => {
-        const userId = localStorage.getItem("userId");
-        const reqBody = { userId: userId };
-        try {
-          const response = await fetch(
-            `${import.meta.env.VITE_BASE_URL}/get-notifications`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(reqBody),
-            },
-          );
-          console.log("🚀 ~ fetchNotifications ~ response:", response);
-          if (!response.ok) throw new Error("Failed to fetch notifications");
-          const data = await response.json();
-          setNotiCounter(data.notifications.notifications.length);
-        } catch (error) {
-          console.error("Error fetching notifications:", error);
-        }
-      };
-      fetchNotifications();
-    }
-  }, [loggedIn, setNotiCounter]);
+    if (!loggedIn) return;
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isDropdownOpen && !event.target.closest(".user-dropdown")) {
-        setIsDropdownOpen(false);
+    const fetchUnreadCount = async () => {
+      const userId = localStorage.getItem("userId");
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/get-notifications`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId }),
+          },
+        );
+        if (!response.ok) return;
+        const data = await response.json();
+
+        // Use server-provided unreadCount if available (new API), else calculate
+        if (data.unreadCount !== undefined) {
+          setNotiCounter(data.unreadCount);
+        } else if (data?.notifications?.notifications) {
+          const unread = data.notifications.notifications.filter(
+            (n) => !n.isRead,
+          ).length;
+          setNotiCounter(unread);
+        }
+      } catch (error) {
+        console.error("Error fetching notification count:", error);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+    fetchUnreadCount();
+  }, [loggedIn, setNotiCounter]);
+
+  // ── Close dropdown on outside click ───────────────────────────────────────
+  useEffect(() => {
+    const handler = (e) => {
+      if (isDropdownOpen && !e.target.closest(".user-dropdown")) {
+        setIsDropdownOpen(false);
+      }
     };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, [isDropdownOpen]);
 
   return (
     <div className="sticky top-0 z-50 bg-white shadow-md border-b border-gray-100 dark:bg-slate-900 dark:text-slate-100 dark:shadow-lg dark:border-slate-800">
       <div className="flex items-center justify-between p-4 border-b relative border-gray-100 dark:border-slate-800">
-        {/* 📱 Mobile Header */}
+        {/* ── Mobile Header ──────────────────────────────────────────────── */}
         <div className="md:hidden flex items-center justify-between w-full">
           <button
-            className="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 rounded-md p-1 transition-colors dark:text-gray-300 dark:hover:text-white"
+            className="text-gray-500 hover:text-gray-700 focus:outline-none rounded-md p-1 transition-colors dark:text-gray-300 dark:hover:text-white"
             onClick={() => setIsSidebarOpen((prev) => !prev)}
           >
             <Menu className="w-6 h-6" />
           </button>
 
           <Link to="/" className="flex items-center">
-            <div className="flex flex-row items-center">
-              <span className="text-lg font-semibold ml-2 text-gray-800 dark:text-slate-100">
-                IISPPR
-              </span>
-            </div>
+            <span className="text-lg font-semibold ml-2 text-gray-800 dark:text-slate-100">
+              IISPPR
+            </span>
           </Link>
 
           <div className="flex items-center space-x-2">
@@ -359,31 +339,28 @@ const TopNavbar = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 rounded-md p-1 transition-colors dark:text-gray-300 dark:hover:text-white"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
               onClick={() => setIsSearchVisible(!isSearchVisible)}
             >
-              {!isSearchVisible ? (
-                <Search className="h-5 w-5" />
-              ) : (
+              {isSearchVisible ? (
                 <X className="h-5 w-5" />
+              ) : (
+                <Search className="h-5 w-5" />
               )}
             </Button>
           </div>
         </div>
 
-        {/* 🖥️ Desktop Header */}
+        {/* ── Desktop Header ─────────────────────────────────────────────── */}
         <div className="hidden md:flex items-center justify-between w-full gap-6">
-          {/* Logo + main nav */}
+          {/* Logo + nav */}
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center group">
-              <div className="flex flex-row items-center">
-                <span className="text-lg font-semibold ml-2 text-gray-800 group-hover:text-black transition-colors dark:text-slate-100 dark:group-hover:text-white">
-                  IISPPR
-                </span>
-              </div>
+              <span className="text-lg font-semibold ml-2 text-gray-800 group-hover:text-black transition-colors dark:text-slate-100 dark:group-hover:text-white">
+                IISPPR
+              </span>
             </Link>
 
-            {/* 🔹 Main top nav (merged from SideNav) */}
             <nav className="hidden lg:flex items-center space-x-1">
               {mainNavItems.map((item) => {
                 const isActive = location.pathname === item.path;
@@ -420,7 +397,6 @@ const TopNavbar = () => {
                 className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all bg-white text-gray-900 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-400"
               />
             </div>
-
             {searchResults.length > 0 && (
               <div className="absolute w-full mt-1 bg-white border rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto dark:bg-slate-800 dark:border-slate-700">
                 {searchResults.map((result) => (
@@ -431,9 +407,8 @@ const TopNavbar = () => {
                       setSearchQuery("");
                       setSearchResults([]);
                     }}
-                    className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors flex items-center dark:hover:bg-slate-700 dark:text-slate-100"
+                    className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors dark:hover:bg-slate-700 dark:text-slate-100"
                   >
-                    <div className="w-1 h-6 bg-blue-500 rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     {result.label}
                   </div>
                 ))}
@@ -441,37 +416,24 @@ const TopNavbar = () => {
             )}
           </div>
 
-          {/* Right side: notifications + user menu / auth buttons */}
+          {/* Right: bell + user menu */}
           <div className="flex items-center space-x-5">
             {loggedIn && (
-              <div className="relative">
-                {/* Tight wrapper: inline-flex so absolute badge anchors to icon box */}
-                <Link
-                  to="/notifications"
-                  className="relative inline-flex items-center justify-center p-2 rounded-full transition-colors"
-                  aria-label={`Notifications (${notiCounter})`}
-                >
-                  {/* Icon (same size as mobile NotiBadge) */}
-                  <Bell className="w-5 h-5 text-gray-600 dark:text-slate-200" />
-
-                  {/* Badge anchored to the wrapper's top-right, slightly outside */}
-                  {notiCounter > 0 && (
-                    <>
-                      <span
-                        className="absolute -top-1 -right-5 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full"
-                        aria-hidden="true"
-                      >
-                        {notiCounter > 9 ? "9+" : notiCounter}
-                      </span>
-                      {/* optional ping behind number */}
-                      <span
-                        className="absolute -top-1 -right-5 rounded-full w-5 h-5 animate-ping opacity-75 bg-red-500"
-                        aria-hidden="true"
-                      />
-                    </>
-                  )}
-                </Link>
-              </div>
+              <Link
+                to="/notifications"
+                className="relative inline-flex items-center justify-center p-2 rounded-full transition-colors"
+                aria-label={`Notifications (${notiCounter})`}
+              >
+                <Bell className="w-5 h-5 text-gray-600 dark:text-slate-200" />
+                {notiCounter > 0 && (
+                  <>
+                    <span className="absolute -top-1 -right-5 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                      {notiCounter > 9 ? "9+" : notiCounter}
+                    </span>
+                    <span className="absolute -top-1 -right-5 rounded-full w-5 h-5 animate-ping opacity-75 bg-red-500" />
+                  </>
+                )}
+              </Link>
             )}
 
             {loggedIn ? (
@@ -528,14 +490,14 @@ const TopNavbar = () => {
               <div className="flex items-center space-x-3">
                 <Button
                   variant="outline"
-                  className="px-4 py-2 text-blue-600 border border-blue-600 hover:bg-blue-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors dark:text-blue-300 dark:border-blue-400 dark:hover:bg-slate-800"
+                  className="px-4 py-2 text-blue-600 border border-blue-600 hover:bg-blue-50 rounded-lg dark:text-blue-300 dark:border-blue-400 dark:hover:bg-slate-800"
                   onClick={() => navigate("/signup")}
                 >
                   Sign Up
                 </Button>
                 <Button
                   variant="primary"
-                  className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors dark:bg-blue-500 dark:hover:bg-blue-400"
+                  className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg dark:bg-blue-500 dark:hover:bg-blue-400"
                   onClick={() => navigate("/login")}
                 >
                   Login
@@ -545,20 +507,19 @@ const TopNavbar = () => {
           </div>
         </div>
 
-        {/* 📱 Mobile Search dropdown */}
+        {/* ── Mobile Search ──────────────────────────────────────────────── */}
         {isSearchVisible && (
           <div className="absolute top-full left-0 w-full p-3 bg-white border-b shadow-md md:hidden dark:bg-slate-900 dark:border-slate-800">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder="Search pages..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-400"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                 autoFocus
               />
-
               {searchResults.length > 0 && (
                 <div className="absolute w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto dark:bg-slate-800 dark:border-slate-700">
                   {searchResults.map((result) => (
@@ -581,18 +542,16 @@ const TopNavbar = () => {
           </div>
         )}
 
-        {/* 📱 Mobile Drawer (menu) */}
+        {/* ── Mobile Drawer ──────────────────────────────────────────────── */}
         {isSidebarOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex md:hidden">
             <div className="bg-white w-72 h-full shadow-lg flex flex-col dark:bg-slate-900 dark:border-r dark:border-slate-800">
               <div className="p-4 border-b border-gray-200 flex items-center justify-between dark:border-slate-800">
-                <div className="flex items-center">
-                  <span className="text-lg font-semibold ml-2 text-gray-800 dark:text-slate-100">
-                    IISPPR | Intern Resource Management
-                  </span>
-                </div>
+                <span className="text-lg font-semibold ml-2 text-gray-800 dark:text-slate-100">
+                  IISPPR
+                </span>
                 <button
-                  className="text-gray-500 hover:text-gray-700 focus:outline-none dark:text-gray-300 dark:hover:text-white"
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
                   onClick={() => setIsSidebarOpen(false)}
                 >
                   <X className="w-6 h-6" />
@@ -611,7 +570,7 @@ const TopNavbar = () => {
                       </p>
                       <p
                         onClick={() => navigate("/your-profile")}
-                        className="text-sm text-gray-500 dark:text-slate-400"
+                        className="text-sm text-gray-500 dark:text-slate-400 cursor-pointer"
                       >
                         Your Account
                       </p>
@@ -622,7 +581,6 @@ const TopNavbar = () => {
 
               <nav className="flex-1 overflow-y-auto p-2">
                 <div className="space-y-1">
-                  {/* Main nav items first (like old SideNav) */}
                   {mainNavItems.map((item) => {
                     const isActive = location.pathname === item.path;
                     return (
@@ -645,10 +603,8 @@ const TopNavbar = () => {
                     );
                   })}
 
-                  {/* Divider */}
                   <div className="my-3 border-t border-gray-200 dark:border-slate-800" />
 
-                  {/* All other routes (searchable items) */}
                   {filteredRoutes.map((route) => (
                     <Link
                       key={route.path}

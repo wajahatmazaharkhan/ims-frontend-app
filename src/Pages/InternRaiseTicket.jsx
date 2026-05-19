@@ -1,6 +1,6 @@
 "use client";
 
-import { Navbar, SideNav, useTitle } from "@/Components/compIndex";
+import { Navbar, SideNav, useTitle, Wrapper } from "@/Components/compIndex";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -74,130 +74,134 @@ const RaiseTicket = () => {
   return (
     <>
       <Navbar />
-      <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Ask a Question</h1>
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white dark:bg-slate-800 shadow rounded-lg p-4 mb-6 space-y-4"
-        >
-          <div>
-            <label className="block mb-1 font-medium dark:text-white">
-              Category
-            </label>
-            <select
-              className="w-full border rounded px-3 py-2 dark:text-white dark:bg-slate-800"
-              value={category}
-              onChange={(e) => {
-                setCategory(e.target.value);
-                if (e.target.value !== "Others") {
-                  setTitle("");
-                }
-              }}
-              required
-            >
-              <option className="dark:text-white dark:bg-slate-800" value="">
-                Select a category
-              </option>
-              {categoryOptions.map((option) => (
-                <option
-                  className="dark:text-white dark:bg-slate-800"
-                  key={option}
-                  value={option}
-                >
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {category === "Others" && (
-            <div>
-              <label className="block mb-1 font-medium">Title</label>
-              <input
-                type="text"
-                className="w-full border rounded px-3 py-2 dark:text-white dark:bg-slate-800"
-                placeholder="Enter ticket title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
-            </div>
-          )}
-
-          <div>
-            <label className="block mb-1 font-medium">Description</label>
-            <textarea
-              className="w-full border rounded px-3 py-2 dark:text-white dark:bg-slate-800"
-              rows={4}
-              placeholder="Describe your issue"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            ></textarea>
-          </div>
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      <Wrapper>
+        <div className="p-6 max-w-4xl mx-auto">
+          <h1 className="text-2xl font-bold mb-4">Ask a Question</h1>
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white dark:bg-slate-800 shadow rounded-lg p-4 mb-6 space-y-4"
           >
-            Submit Ticket
-          </button>
-        </form>
-
-        <h2 className="text-xl font-semibold mb-3">Your Previous Tickets</h2>
-        {loading ? (
-          <p className="dark:text-white dark:bg-slate-800">
-            Loading tickets...
-          </p>
-        ) : Array.isArray(tickets) && tickets.length === 0 ? (
-          <p className="dark:text-white dark:bg-slate-800">No tickets found.</p>
-        ) : Array.isArray(tickets) ? (
-          <>
-            <div className="space-y-4 dark:text-white dark:bg-slate-800">
-              {tickets.map((ticket) => (
-                <div
-                  key={ticket._id}
-                  className="border rounded-lg p-4 shadow-sm bg-white dark:text-white dark:bg-slate-800"
-                >
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium dark:text-white dark:bg-slate-800">
-                      {ticket.title}
-                    </h3>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm dark:text-white dark:bg-slate-800 ${
-                        ticket.status === "Open"
-                          ? "bg-green-100 text-green-700"
-                          : ticket.status === "In Progress"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : ticket.status === "Pending Confirmation"
-                              ? "bg-blue-100 text-blue-700"
-                              : "bg-gray-200 text-gray-700"
-                      }`}
-                    >
-                      {ticket.status}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 mt-1 dark:text-white dark:bg-slate-800">
-                    {ticket.description}
-                  </p>
-                  <p className="text-xs text-gray-500 mt- dark:text-white dark:bg-slate-800">
-                    Created At: {new Date(ticket.createdAt).toLocaleString()}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-center">
-              <button
-                className="mt-[2vh] bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                onClick={handleManage}
+            <div>
+              <label className="block mb-1 font-medium dark:text-white">
+                Category
+              </label>
+              <select
+                className="w-full border rounded px-3 py-2 dark:text-white dark:bg-slate-800"
+                value={category}
+                onChange={(e) => {
+                  setCategory(e.target.value);
+                  if (e.target.value !== "Others") {
+                    setTitle("");
+                  }
+                }}
+                required
               >
-                Manage Tickets
-              </button>
+                <option className="dark:text-white dark:bg-slate-800" value="">
+                  Select a category
+                </option>
+                {categoryOptions.map((option) => (
+                  <option
+                    className="dark:text-white dark:bg-slate-800"
+                    key={option}
+                    value={option}
+                  >
+                    {option}
+                  </option>
+                ))}
+              </select>
             </div>
-          </>
-        ) : (
-          <p>Something went wrong fetching tickets.</p>
-        )}
-      </div>
+
+            {category === "Others" && (
+              <div>
+                <label className="block mb-1 font-medium">Title</label>
+                <input
+                  type="text"
+                  className="w-full border rounded px-3 py-2 dark:text-white dark:bg-slate-800"
+                  placeholder="Enter ticket title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="block mb-1 font-medium">Description</label>
+              <textarea
+                className="w-full border rounded px-3 py-2 dark:text-white dark:bg-slate-800"
+                rows={4}
+                placeholder="Describe your issue"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Submit Ticket
+            </button>
+          </form>
+
+          <h2 className="text-xl font-semibold mb-3">Your Previous Tickets</h2>
+          {loading ? (
+            <p className="dark:text-white dark:bg-slate-800">
+              Loading tickets...
+            </p>
+          ) : Array.isArray(tickets) && tickets.length === 0 ? (
+            <p className="dark:text-white dark:bg-slate-800">
+              No tickets found.
+            </p>
+          ) : Array.isArray(tickets) ? (
+            <>
+              <div className="space-y-4 dark:text-white dark:bg-slate-800">
+                {tickets.map((ticket) => (
+                  <div
+                    key={ticket._id}
+                    className="border rounded-lg p-4 shadow-sm bg-white dark:text-white dark:bg-slate-800"
+                  >
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-medium dark:text-white dark:bg-slate-800">
+                        {ticket.title}
+                      </h3>
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm dark:text-white dark:bg-slate-800 ${
+                          ticket.status === "Open"
+                            ? "bg-green-100 text-green-700"
+                            : ticket.status === "In Progress"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : ticket.status === "Pending Confirmation"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-gray-200 text-gray-700"
+                        }`}
+                      >
+                        {ticket.status}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 mt-1 dark:text-white dark:bg-slate-800">
+                      {ticket.description}
+                    </p>
+                    <p className="text-xs text-gray-500 mt- dark:text-white dark:bg-slate-800">
+                      Created At: {new Date(ticket.createdAt).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-center">
+                <button
+                  className="mt-[2vh] bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  onClick={handleManage}
+                >
+                  Manage Tickets
+                </button>
+              </div>
+            </>
+          ) : (
+            <p>Something went wrong fetching tickets.</p>
+          )}
+        </div>
+      </Wrapper>
     </>
   );
 };

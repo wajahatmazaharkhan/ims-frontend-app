@@ -1,10 +1,10 @@
-import { createContext, useState, useContext, useEffect, useRef } from "react";
-import toast from "@/utils/toast";
+import { createContext, useState, useContext } from "react";
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [dashboard, setDashboard] = useState("Home");
+  // notiCounter = total unread count (used for badge)
   const [notiCounter, setNotiCounter] = useState(0);
   const [modalView, setModalView] = useState(false);
   const [username, setUsername] = useState("");

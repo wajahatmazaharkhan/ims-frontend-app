@@ -19,6 +19,7 @@ import {
   Wrapper,
   useTitle,
   InternNecessities,
+  Footer,
 } from "@/Components/compIndex";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -748,6 +749,7 @@ const BatchDashboard = () => {
           </div>
         </Wrapper>
       </div>
+      <Footer />
     </>
   );
 };

@@ -2,7 +2,7 @@ import React from "react";
 
 const Wrapper = ({ children }) => {
   return (
-    <div className="p-6 min-h-screen">{children}</div>
+    <div className="min-h-screen dark:bg-slate-950">{children}</div>
   );
 };
 

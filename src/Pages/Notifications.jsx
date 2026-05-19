@@ -40,13 +40,13 @@ const Notifications = () => {
               "Content-Type": "application/json", // important!
             },
             body: JSON.stringify(reqbody),
-          }
+          },
         );
         if (!response.ok) throw new Error("Failed to fetch notifications");
         const data = await response.json();
         if (data?.notifications?.notifications) {
           const sortedNotifications = data.notifications.notifications.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
           );
           setNotifications(sortedNotifications);
         } else {
@@ -66,7 +66,7 @@ const Notifications = () => {
   const fetchTaskDetails = async (taskId) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/task/get-task/${taskId}`
+        `${import.meta.env.VITE_BASE_URL}/task/get-task/${taskId}`,
       );
       if (!response.ok) throw new Error("Failed to fetch task details");
       const data = await response.json();
@@ -172,7 +172,7 @@ const Notifications = () => {
           </h3>
           <Badge
             className={`${getNotificationTypeStyles(
-              taskDetails.status
+              taskDetails.status,
             )} capitalize px-3 py-1 border`}
           >
             {taskDetails.status}
@@ -230,7 +230,7 @@ const Notifications = () => {
       <div className="flex items-center gap-3 mb-2">
         <Badge
           className={`${getNotificationTypeStyles(
-            selectedNotification?.type
+            selectedNotification?.type,
           )} px-3 py-1 border`}
         >
           {selectedNotification?.type || "Update"}
@@ -275,13 +275,13 @@ const Notifications = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       if (repsonse.status === 200) {
         toast.success("Notification deleted");
         setIsModalOpen(false);
         const updatedNotifications = notifications.filter(
-          (note) => note._id !== noteId
+          (note) => note._id !== noteId,
         );
         setNotifications(updatedNotifications);
         setNotiCounter(updatedNotifications.length);
@@ -295,7 +295,7 @@ const Notifications = () => {
   return (
     <>
       <Navbar />
-      <div className="relative bg-gray-50 dark:bg-slate-950 min-h-screen ml-0 md:ml-32 dark:text-slate-100">
+      <div className="relative bg-gray-50 dark:bg-slate-950 min-h-screen ml-0 dark:text-slate-100">
         <div className="p-6">
           <div className="max-w-5xl mx-auto">
             <Card className="shadow-lg dark:bg-slate-900 dark:border dark:border-slate-800">
@@ -372,7 +372,7 @@ const Notifications = () => {
                             <div className="flex items-center gap-3 mb-2">
                               <Badge
                                 className={`${getNotificationTypeStyles(
-                                  notification.type
+                                  notification.type,
                                 )} px-3 py-1 border`}
                               >
                                 {notification.type || "Update"}
@@ -441,12 +441,10 @@ const Notifications = () => {
           <div className="flex justify-center mt-6">
             <button
               onClick={() => deleteNoti(selectedNotification._id)}
-              className="flex items-center space-x-2 text-red-500 outline-none dark:text-red-400"
+              className="dark:bg-white p-2 rounded-xl flex items-center space-x-2 text-red-500 outline-none dark:text-red-400"
             >
-              DELETE
-              <span className="ml-2">
-                <Trash size={17} />
-              </span>
+              Delete &nbsp;
+              <Trash size={17} />
             </button>
           </div>
         </DialogContent>
