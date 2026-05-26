@@ -17,6 +17,7 @@ import iispprLogo from "../assets/Images/iisprlogo.png";
 import countryCodes from "@/Components/CountryCodes";
 import { useAuthContext } from "@/context/AuthContext";
 import { signupUser } from "@/api/auth.service";
+import Turnstile from "react-turnstile";
 
 const SignUp = ({ onSwitchToSignin }) => {
   useTitle("Register");
@@ -35,6 +36,7 @@ const SignUp = ({ onSwitchToSignin }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [batches, setBatches] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
   const countrySelectRef = useRef(null);
 
   const { loggedIn } = useAuthContext();
@@ -140,7 +142,7 @@ const SignUp = ({ onSwitchToSignin }) => {
   // };
 
   const registerUser = async () => {
-    console.log('country code',countryCode)
+    console.log("country code", countryCode);
     try {
       const res = await signupUser({
         name: fullName,
@@ -151,6 +153,7 @@ const SignUp = ({ onSwitchToSignin }) => {
         startDate: new Date().toISOString().split("T")[0],
         EndDate: endDate,
         department,
+        turnstileToken
       });
 
       console.log("Response", res);
@@ -159,7 +162,7 @@ const SignUp = ({ onSwitchToSignin }) => {
       }
       navigate("/login");
     } catch (error) {
-      toast.error('Something went wrong!');
+      toast.error("Something went wrong!");
       console.error("API Error", error);
     }
   };
@@ -182,6 +185,9 @@ const SignUp = ({ onSwitchToSignin }) => {
       if (password !== confirmPassword)
         return toast.error("Passwords don't match");
       if (phone.length < 6) return toast.error("Enter a valid phone number");
+      if (!turnstileToken) {
+        return toast.error("Please verify you are human");
+      }
     }
     await registerUser();
     // == REMOVE OTP VERIFICATION TEMPORARILY == //
@@ -411,6 +417,21 @@ const SignUp = ({ onSwitchToSignin }) => {
                 </div>
               </>
             )}
+
+            <div className="flex justify-center">
+              <Turnstile
+                sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                onSuccess={(token) => {
+                  setTurnstileToken(token);
+                }}
+                onExpire={() => {
+                  setTurnstileToken("");
+                }}
+                onError={() => {
+                  toast.error("Verification failed");
+                }}
+              />
+            </div>
 
             <button
               type="submit"

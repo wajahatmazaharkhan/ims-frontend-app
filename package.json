@@ -1,7 +1,7 @@
 {
   "name": "iisppr---frontend",
   "private": true,
-  "version": "1.2.10",
+  "version": "1.2.11",
   "type": "module",
   "scripts": {
     "development": "vite",
@@ -57,6 +57,7 @@
     "react-modal": "^3.16.3",
     "react-router-dom": "^7.1.1",
     "react-toastify": "^11.0.2",
+    "react-turnstile": "^1.1.5",
     "serve": "^14.2.6",
     "socket.io-client": "^4.8.1",
     "sweetalert2": "^11.15.3",

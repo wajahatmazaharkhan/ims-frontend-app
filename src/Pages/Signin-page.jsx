@@ -9,6 +9,7 @@ import { useAuthContext } from "@/context/AuthContext";
 import { useAppContext } from "@/context/AppContext";
 import iispprLogo from "../assets/Images/iisprlogo.png";
 import useTitle from "@/Components/useTitle";
+import Turnstile from "react-turnstile";
 
 // import { HrAllUsersInterns } from "@/HrHeadAndIntern/HrIndex";
 
@@ -18,6 +19,7 @@ const Signin = ({ onSwitchToSignup }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const navigate = useNavigate();
   useTitle("Login");
@@ -45,6 +47,7 @@ const Signin = ({ onSwitchToSignup }) => {
       const response = await axios.post(login, {
         email: email,
         password: password,
+        turnstileToken,
       });
 
       const { token, user } = response.data;
@@ -93,7 +96,7 @@ const Signin = ({ onSwitchToSignup }) => {
       }
 
       console.log(`response for checking role :- ${JSON.stringify(
-        response.data.user
+        response.data.user,
       )}
 }`);
     } catch (error) {
@@ -111,6 +114,10 @@ const Signin = ({ onSwitchToSignup }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!turnstileToken) {
+      toast.error("Please verify you are human.");
+      return;
+    }
     if (!email || !password) {
       toast.error("Please fill in all fields.");
     } else {
@@ -207,6 +214,21 @@ const Signin = ({ onSwitchToSignup }) => {
                 {error}
               </p>
             )}
+
+            <div className="flex justify-center">
+              <Turnstile
+                sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                onSuccess={(token) => {
+                  setTurnstileToken(token);
+                }}
+                onExpire={() => {
+                  setTurnstileToken("");
+                }}
+                onError={() => {
+                  toast.error("Verification failed");
+                }}
+              />
+            </div>
 
             {/* Submit button with loading state */}
             <button
